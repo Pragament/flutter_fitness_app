@@ -7,11 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:just_another_workout_timer/model/product_item.dart';
 import 'package:pref/pref.dart';
 import 'package:prefs/prefs.dart';
 
 import 'generated/l10n.dart';
 import 'layouts/home_page.dart';
+import 'model/pantry_item.dart';
 import 'utils/migrations.dart';
 import 'utils/sound_helper.dart';
 import 'utils/tts_helper.dart';
@@ -21,6 +25,11 @@ void main() async {
   GestureBinding.instance.resamplingEnabled = true;
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Prefs.init();
+
+  // Hive Adapter
+  await Hive.initFlutter();
+  Hive.registerAdapter(PantryItemAdapter());
+  Hive.registerAdapter(ProductItemAdapter());
 
   PrefServiceShared.init(
     defaults: {
