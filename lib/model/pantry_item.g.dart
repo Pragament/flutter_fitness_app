@@ -17,28 +17,31 @@ class PantryItemAdapter extends TypeAdapter<PantryItem> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PantryItem(
-      name: fields[0] as String,
-      quantity: fields[1] as int,
-      unit: fields[2] as String,
-      lastModified: fields[3] as DateTime,
-      imageUri: fields[4] as String,
+      id: fields[0] as String,
+      name: fields[1] as String,
+      imageUri: fields[2] as String,
+      quantity: fields[3] as int,
+      unit: fields[4] as String,
+      lastModified: fields[5] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, PantryItem obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.quantity)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.unit)
+      ..write(obj.imageUri)
       ..writeByte(3)
-      ..write(obj.lastModified)
+      ..write(obj.quantity)
       ..writeByte(4)
-      ..write(obj.imageUri);
+      ..write(obj.unit)
+      ..writeByte(5)
+      ..write(obj.lastModified);
   }
 
   @override

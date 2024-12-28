@@ -19,6 +19,7 @@ import 'model/pantry_item.dart';
 import 'utils/migrations.dart';
 import 'utils/sound_helper.dart';
 import 'utils/tts_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +50,7 @@ void main() async {
     ]).then(
       (_) {
         runApp(
-          PrefService(service: service, child: Phoenix(child: JAWTApp())),
+          ProviderScope(child: PrefService(service: service, child: Phoenix(child: JAWTApp()))),
         );
         FlutterNativeSplash.remove();
       },

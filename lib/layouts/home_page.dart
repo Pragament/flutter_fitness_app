@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:just_another_workout_timer/layouts/pantry_item.dart';
+import 'package:just_another_workout_timer/layouts/pantry_item1.dart';
+import 'package:just_another_workout_timer/layouts/product_item_screen.dart';
 import 'package:just_another_workout_timer/layouts/workout_runner.dart';
 
 import '../generated/l10n.dart';
@@ -214,11 +215,23 @@ class HomePageState extends State<HomePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PantryItemScreen(),
+                      builder: (context) => PantryItemScreen(),
                     ),
                   );
                 },
               ),
+              // ListTile(
+              //   leading: Icon(Icons.kitchen),
+              //   title: Text('Pantry Items'),
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => const PantryItemScreen(),
+              //       ),
+              //     );
+              //   },
+              // ),
             ],
           ),
         ),
