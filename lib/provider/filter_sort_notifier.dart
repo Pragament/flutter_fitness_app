@@ -11,8 +11,8 @@ class FilterSortNotifier extends StateNotifier<Map<String, dynamic>> {
     'sortCriteria': '',
     'isProductMode': false,
     'isShoppingMode': false,
-    'filteredItems': <PantryItem>[],
-    'filteredProducts': <ProductItem>[],
+    'filteredItems': ref.watch(pantryItemsProvider),
+    'filteredProducts': ref.watch(productsProvider),
   }) {
     // Listen to changes in the search query and trigger filtering
     ref.listen<String>(searchQueryProvider, (_, searchQuery) {
@@ -48,6 +48,7 @@ class FilterSortNotifier extends StateNotifier<Map<String, dynamic>> {
   }
 
   void toggleShoppingMode() {
+    print("Toggled");
     state = {
       ...state,
       'isShoppingMode': !state['isShoppingMode'],

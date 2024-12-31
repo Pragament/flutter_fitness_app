@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:just_another_workout_timer/layouts/product_item_screen.dart';
+import 'package:uuid/uuid.dart';
 import '../model/pantry_item.dart'; // Model for PantryItem
 import '../model/product_item.dart'; // Model for ProductItem
 import 'package:http/http.dart' as http;
@@ -23,8 +24,14 @@ class PantryItemScreen extends ConsumerWidget {
 
     final filterSortState = ref.watch(filterSortProvider);
 
+    final products = ref.watch(productsProvider);
+
+    final filteredProducts = filterSortState['filteredProducts'] as List<ProductItem>;
+
+
     // Extracting filtered items/products
-    final List<PantryItem> filteredPantryItems = filterSortState['filteredItems'];
+    List<PantryItem> filteredPantryItems = filterSortState['filteredItems'];
+
 
     // Placeholder lists for items/products
     List<PantryItem> _items = pantryItems.isNotEmpty
@@ -48,6 +55,7 @@ class PantryItemScreen extends ConsumerWidget {
             onChanged: (value) {
               ref.read(filterSortProvider.notifier).setSortCriteria(value!);
               ref.read(filterSortProvider.notifier).filterPantryItems(_items);
+              ref.read(filterSortProvider.notifier).filterProducts(products);
             },
           ),
           // Switch for toggling shopping mode
@@ -69,17 +77,18 @@ class PantryItemScreen extends ConsumerWidget {
               onChanged: (value) {
                 ref.read(searchQueryProvider.notifier).state = value;
                 ref.read(filterSortProvider.notifier).filterPantryItems(_items);
+                ref.read(filterSortProvider.notifier).filterProducts(products);
               },
 
               decoration: InputDecoration(
                 hintText: "Search items...",
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
                   onPressed: () {
-                    filterSortState['sortCriteria']='';
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => ProductItemScreen()));
+                    _searchController.text = "";
+                    ref.read(searchQueryProvider.notifier).state = '';
                   },
-                  icon: const Icon(Icons.add),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -89,7 +98,29 @@ class PantryItemScreen extends ConsumerWidget {
           ),
           // List of Items or Products
           Expanded(
-            child: _buildPantryList(filteredPantryItems.isEmpty? ref.watch(pantryItemsProvider): filteredPantryItems, ref)
+            child: filteredPantryItems.isNotEmpty
+              ? _buildPantryList(filteredPantryItems, ref)
+              : filteredProducts.isNotEmpty
+                ? _buildProductList(filteredProducts, ref)
+                : Center(
+                child: ElevatedButton(
+                    onPressed: () {
+                      print("Clickeed");
+                        final newItem = PantryItem(
+                            id: const Uuid().v4(),
+                            name: ref.read(searchQueryProvider.notifier).state,
+                            imageUri: "",
+                            quantity: 1,
+                            unit: "Count",
+                            lastModified: DateTime.now()
+                        );
+                      ref.read(pantryItemsProvider.notifier).addItem(newItem);
+                      ref.read(searchQueryProvider.notifier).state = "";
+                        filteredPantryItems = filterSortState['filteredItems'];
+                    },
+                    child: Text("Click to add it to pantry")
+                )
+            ),
           ),
         ],
       ),
@@ -118,10 +149,11 @@ class PantryItemScreen extends ConsumerWidget {
                 const SizedBox(width: 10,),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(7),
-                  child: Image.network(
+                  child: pantryItems[index].imageUri.isNotEmpty
+                      ? Image.network(
                     pantryItems[index].imageUri,
                     width: 40,
-                  ),
+                  ) : Icon(Icons.shopping_bag, size: 40,),
                 ),
                 Expanded(
                   child: Column(
@@ -170,18 +202,55 @@ class PantryItemScreen extends ConsumerWidget {
                               }
                             },
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.save),
+                          // !ref.read(filterSortProvider.notifier).isShoppingMode
+                               IconButton(
+                            icon: const Icon(Icons.save, size: 25,),
                             onPressed: () => ref
                                 .read(pantryItemsProvider.notifier)
                                 .saveUpdatedItem(pantryItems[index]),
-                          ),
+                          )
+                              // : SizedBox(width: 25,),
                         ],
                       ),
                     ],
                   ),
                 ),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProductList(List<ProductItem> products, WidgetRef ref) {
+    print("Length: ${products.length}");
+    return ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.all(7),
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.grey[100],
+          ),
+          child: ListTile(
+            leading: Image.network(
+              products[index].imageUrl,
+              width: 40,
+            ),
+            title: Text(products[index].name),
+            trailing: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  ref.watch(pantryItemsProvider);
+                  ref.read(productsProvider.notifier)
+                      .addProductToPantry(ref, products[index]);
+                  ref.read(filterSortProvider.notifier).toggleProductMode();
+                  // Navigator.pop(context);
+                }
+
             ),
           ),
         );

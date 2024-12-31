@@ -18,6 +18,8 @@ class PantryItemNotifier extends StateNotifier<List<PantryItem>> {
     var box = await Hive.openBox<PantryItem>('pantryBox');
     final newItem = item.copyWith(id: const Uuid().v4()); // Assign a unique ID
     await box.put(newItem.id, newItem);
+    print("Click to add it to pantry");
+    loadItems();
     state = List.from(box.values);
   }
 
