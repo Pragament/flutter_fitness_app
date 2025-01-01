@@ -48,6 +48,7 @@ class ProductNotifier extends StateNotifier<List<ProductItem>> {
       unit: 'Count',
       lastModified: DateTime.now(),
       imageUri: product.imageUrl,
+      modified: false
     );
     await pantryNotifier.addItem(newItem);
   }
