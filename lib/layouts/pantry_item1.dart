@@ -26,7 +26,7 @@ class PantryItemScreen extends ConsumerWidget {
 
     final products = ref.watch(productsProvider);
 
-    final filteredProducts = filterSortState['filteredProducts'] as List<ProductItem>;
+    List<ProductItem> filteredProducts = filterSortState['filteredProducts'] as List<ProductItem>;
 
 
     // Extracting filtered items/products
@@ -86,8 +86,10 @@ class PantryItemScreen extends ConsumerWidget {
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
-                    _searchController.text = "";
+                    _searchController.clear();
                     ref.read(searchQueryProvider.notifier).state = '';
+                    ref.read(filterSortProvider.notifier).filterPantryItems(_items);
+                    ref.read(filterSortProvider.notifier).filterProducts(products);
                   },
                 ),
                 border: OutlineInputBorder(
@@ -105,17 +107,20 @@ class PantryItemScreen extends ConsumerWidget {
                 : Center(
                 child: ElevatedButton(
                     onPressed: () {
-                      print("Clickeed");
-                        final newItem = PantryItem(
-                            id: const Uuid().v4(),
-                            name: ref.read(searchQueryProvider.notifier).state,
-                            imageUri: "",
-                            quantity: 1,
-                            unit: "Count",
-                            lastModified: DateTime.now()
-                        );
-                      ref.read(pantryItemsProvider.notifier).addItem(newItem);
-                      ref.read(searchQueryProvider.notifier).state = "";
+                      print("Clicked");
+                        if(ref.read(searchQueryProvider.notifier).state.isNotEmpty) {
+                          final newItem = PantryItem(
+                              id: const Uuid().v4(),
+                              name: ref.read(searchQueryProvider.notifier).state,
+                              imageUri: "",
+                              quantity: 1,
+                              unit: "Count",
+                              lastModified: DateTime.now(),
+                              modified: false
+                          );
+                          ref.read(pantryItemsProvider.notifier).addItem(newItem);
+                        }
+                      ref.read(searchQueryProvider.notifier).state = '';
                         filteredPantryItems = filterSortState['filteredItems'];
                     },
                     child: Text("Click to add it to pantry")
@@ -177,7 +182,17 @@ class PantryItemScreen extends ConsumerWidget {
                                       .decrementQuantity(ref, index);
                                 }
                               ),
-                              Text(pantryItems[index].quantity.toString()),
+                              Text(
+                                ref.read(pantryItemsProvider.notifier).isModified(pantryItems[index].id)
+                                    ? "${pantryItems[index].quantity}*"
+                                    : pantryItems[index].quantity.toString(),
+                                style: TextStyle(
+                                  color: ref.read(pantryItemsProvider.notifier).isModified(pantryItems[index].id)
+                                      ? Colors.orange
+                                      : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.add),
                                 onPressed: () => ref
@@ -198,18 +213,18 @@ class PantryItemScreen extends ConsumerWidget {
                             onChanged: (value) {
                               if (value != null) {
                                 final updatedItem = pantryItems[index].copyWith(unit: value);
-                                ref.read(pantryItemsProvider.notifier).saveUpdatedItem(updatedItem);
+                                ref.read(pantryItemsProvider.notifier).saveUpdatedItemFromButton(updatedItem);
                               }
                             },
                           ),
-                          // !ref.read(filterSortProvider.notifier).isShoppingMode
-                               IconButton(
+                          !ref.read(filterSortProvider.notifier).isShoppingMode && ref.read(pantryItemsProvider.notifier).isModified(pantryItems[index].id)
+                              ? IconButton(
                             icon: const Icon(Icons.save, size: 25,),
                             onPressed: () => ref
                                 .read(pantryItemsProvider.notifier)
-                                .saveUpdatedItem(pantryItems[index]),
+                                .saveUpdatedItemFromButton(pantryItems[index]),
                           )
-                              // : SizedBox(width: 25,),
+                              : SizedBox(width: 30,),
                         ],
                       ),
                     ],

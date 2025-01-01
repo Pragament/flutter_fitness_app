@@ -22,6 +22,9 @@ class PantryItem {
   @HiveField(5)
   final DateTime lastModified;
 
+  @HiveField(6)
+  final bool modified;
+
   PantryItem({
     required this.id,
     required this.name,
@@ -29,6 +32,7 @@ class PantryItem {
     required this.quantity,
     required this.unit,
     required this.lastModified,
+    required this.modified
   });
 
   PantryItem copyWith({
@@ -38,6 +42,7 @@ class PantryItem {
     int? quantity,
     String? unit,
     DateTime? lastModified,
+    bool? modified,
   }) {
     return PantryItem(
       id: id ?? this.id,
@@ -46,6 +51,7 @@ class PantryItem {
       quantity: quantity ?? this.quantity,
       unit: unit ?? this.unit,
       lastModified: lastModified ?? this.lastModified,
+      modified: modified ?? this.modified
     );
   }
 }

@@ -23,13 +23,14 @@ class PantryItemAdapter extends TypeAdapter<PantryItem> {
       quantity: fields[3] as int,
       unit: fields[4] as String,
       lastModified: fields[5] as DateTime,
+      modified: fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, PantryItem obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class PantryItemAdapter extends TypeAdapter<PantryItem> {
       ..writeByte(4)
       ..write(obj.unit)
       ..writeByte(5)
-      ..write(obj.lastModified);
+      ..write(obj.lastModified)
+      ..writeByte(6)
+      ..write(obj.modified);
   }
 
   @override
