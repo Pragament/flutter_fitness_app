@@ -45,11 +45,18 @@ class PantryItemScreen extends ConsumerWidget {
           // Dropdown for sorting criteria
           DropdownButton<String>(
             value: filterSortState['sortCriteria']==''? null : filterSortState['sortCriteria'],
-            hint: const Text("Select Sort By"),
-            items: ['Name', 'Stock Value', 'Last Modified'].map((String value) {
+            hint: const Text("Select Sort By", style: TextStyle(fontSize: 15),),
+            items: [
+              'Name -- Asc to Desc',
+              'Name -- Desc to Asc',
+              'Stock Value -- Asc to Desc',
+              'Stock Value -- Desc to Asc',
+              'Last Modif.  -- Asc to Desc',
+              'Last Modif. -- Desc to Asc'
+            ].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
-                child: Text(value),
+                child: Text(value, style: TextStyle(fontSize: 13),),
               );
             }).toList(),
             onChanged: (value) {
