@@ -81,14 +81,23 @@ class FilterSortNotifier extends StateNotifier<Map<String, dynamic>> {
         : items.where((item) => item.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
 
     switch (state['sortCriteria']) {
-      case 'Name':
+      case 'Name -- Asc to Desc':
         filtered.sort((a, b) => a.name.compareTo(b.name));
         break;
-      case 'Stock Value':
+      case 'Name -- Desc to Asc':
+        filtered.sort((a, b) => b.name.compareTo(a.name));
+        break;
+      case 'Stock Value -- Asc to Desc':
         filtered.sort((a, b) => a.quantity.compareTo(b.quantity));
         break;
-      case 'Last Modified':
+      case 'Stock Value -- Desc to Asc':
+        filtered.sort((a, b) => b.quantity.compareTo(a.quantity));
+        break;
+      case 'Last Modif.  -- Asc to Desc':
         filtered.sort((a, b) => b.lastModified.compareTo(a.lastModified));
+        break;
+      case 'Last Modif.  -- Desc to Asc':
+        filtered.sort((a, b) => a.lastModified.compareTo(b.lastModified));
         break;
     }
 
@@ -103,8 +112,10 @@ class FilterSortNotifier extends StateNotifier<Map<String, dynamic>> {
         ? List.from(products)
         : products.where((product) => product.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
 
-    if (state['sortCriteria'] == 'Name') {
+    if (state['sortCriteria'] == 'Name -- Asc to Desc') {
       filtered.sort((a, b) => a.name.compareTo(b.name));
+    } else if (state['sortCriteria'] == 'Name -- Desc to Asc') {
+      filtered.sort((a, b) => b.name.compareTo(a.name));
     }
 
     state = {
