@@ -1,3 +1,5 @@
+<img src="https://github.com/user-attachments/assets/4a71dd1e-35c6-4be7-a828-0b14fb339604" width="250px" />
+
 <!-- PROJECT SHIELDS -->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
