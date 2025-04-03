@@ -1,4 +1,3 @@
-// Necessary Imports
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +8,8 @@ import '../model/pantry_item.dart'; // Model for PantryItem
 import '../model/product_item.dart'; // Model for ProductItem
 import 'package:http/http.dart' as http;
 import '../provider/providers.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'barcode_scanner_screen.dart';
 
 
 class PantryItemScreen extends ConsumerWidget {
@@ -135,6 +136,12 @@ class PantryItemScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+      // Add the floating action button for barcode scanning
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _scanBarcode(context, ref),
+        child: const Icon(Icons.qr_code_scanner),
+        tooltip: 'Scan Barcode',
       ),
     );
   }
@@ -307,8 +314,95 @@ class PantryItemScreen extends ConsumerWidget {
       },
     );
   }
+  
+  // Barcode scanning method
+  Future<void> _scanBarcode(BuildContext context, WidgetRef ref) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const BarcodeScannerScreen(),
+      ),
+    );
+
+    if (result != null) {
+      _showAddItemDialog(context, ref, result);
+    }
+  }
+
+  // Dialog for adding a scanned item
+  void _showAddItemDialog(BuildContext context, WidgetRef ref, String barcode) {
+    final nameController = TextEditingController();
+    final quantityController = TextEditingController(text: '1');
+    String selectedUnit = 'Count';
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Add Item (Barcode: $barcode)'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Item Name'),
+                    ),
+                    TextField(
+                      controller: quantityController,
+                      decoration: const InputDecoration(labelText: 'Quantity'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    DropdownButton<String>(
+                      value: selectedUnit,
+                      items: ['Count', 'Grams', 'Kg'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedUnit = value;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (nameController.text.isNotEmpty) {
+                      final newItem = PantryItem(
+                        id: const Uuid().v4(),
+                        name: nameController.text,
+                        imageUri: "",
+                        quantity: int.tryParse(quantityController.text) ?? 1,
+                        unit: selectedUnit,
+                        lastModified: DateTime.now(),
+                        modified: false,
+                      );
+                      ref.read(pantryItemsProvider.notifier).addItem(newItem);
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
 }
-
-
-
-
