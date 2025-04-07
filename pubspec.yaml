@@ -35,13 +35,14 @@ dependencies:
   http:
   riverpod: ^2.6.1
   flutter_riverpod:
+  intl_utils: ^2.8.8
+  flutter_oss_licenses: ^3.0.4
+  mobile_scanner: ^6.0.7
 
 dev_dependencies:
   build_runner: '^2.4.11'
   flutter_launcher_icons: '^0.13.1'
   flutter_lints: '^4.0.0'
-  flutter_oss_licenses: '^3.0.2'
-  intl_utils: '^2.8.7'
   json_serializable: '^6.8.0'
   pubspec_dependency_sorter: '^1.0.5'
   hive_generator:
